@@ -1,12 +1,23 @@
 import static java.lang.IO.*;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 void main() {
 
     // ===== Estrutura de dados =====
     String[] nomes = new String[10];
     int[] idades = new int[10];
     String[] cursos = new String[10];
-    int totalAlunos = 0;
+    int totalAlunos;
+
+    // ===== Persistência em arquivo =====
+    String arquivoDados = "alunos.csv";
+    totalAlunos = carregarAlunos(arquivoDados, nomes, idades, cursos);
 
     boolean continuar = true;
 
@@ -18,6 +29,7 @@ void main() {
         println("1 - Cadastrar aluno");
         println("2 - Listar alunos");
         println("3 - Buscar aluno pelo nome");
+
         println("4 - Remover aluno");
         println("5 - Sair");
         println("");
@@ -42,6 +54,8 @@ void main() {
                         idades[totalAlunos] = idade;
                         cursos[totalAlunos] = curso;
                         totalAlunos++;
+
+                        salvarAlunos(arquivoDados, nomes, idades, cursos, totalAlunos);
 
                         println("Aluno cadastrado com sucesso!");
                     }
@@ -121,6 +135,8 @@ void main() {
 
                         totalAlunos--;
 
+                        salvarAlunos(arquivoDados, nomes, idades, cursos, totalAlunos);
+
                         println("Aluno removido com sucesso.");
                     }
                 }
@@ -137,5 +153,46 @@ void main() {
         }
 
         println("");
+    }
+}
+
+// ===== Carrega os alunos a partir do arquivo CSV (banco de dados) =====
+int carregarAlunos(String caminho, String[] nomes, int[] idades, String[] cursos) {
+    int total = 0;
+    File arquivo = new File(caminho);
+
+    if (!arquivo.exists()) {
+        return total;
+    }
+
+    try (BufferedReader leitor = new BufferedReader(new FileReader(arquivo))) {
+        String linha;
+
+        while ((linha = leitor.readLine()) != null && total < nomes.length) {
+            String[] campos = linha.split(",", 3);
+
+            if (campos.length == 3) {
+                nomes[total] = campos[0];
+                idades[total] = Integer.parseInt(campos[1]);
+                cursos[total] = campos[2];
+                total++;
+            }
+        }
+    } catch (IOException erro) {
+        println("Não foi possível carregar o arquivo de dados: " + erro.getMessage());
+    }
+
+    return total;
+}
+
+// ===== Salva os alunos no arquivo CSV (banco de dados) =====
+void salvarAlunos(String caminho, String[] nomes, int[] idades, String[] cursos, int totalAlunos) {
+    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(caminho))) {
+        for (int i = 0; i < totalAlunos; i++) {
+            escritor.write(nomes[i] + "," + idades[i] + "," + cursos[i]);
+            escritor.newLine();
+        }
+    } catch (IOException erro) {
+        println("Não foi possível salvar o arquivo de dados: " + erro.getMessage());
     }
 }

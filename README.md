@@ -25,6 +25,6 @@ O menu principal tem 5 opções:
 4. Remover aluno
 5. Sair
 
-## Observação
+## Persistência de dados
 
-Os dados ficam apenas na memória durante a execução. Ao fechar o programa, tudo é perdido.
+Os alunos cadastrados são salvos automaticamente no arquivo `alunos.csv`, na raiz do projeto. Esse arquivo funciona como um banco de dados simples: ele é lido ao iniciar o programa e atualizado sempre que um aluno é cadastrado ou removido. Assim, os dados continuam disponíveis entre execuções.
